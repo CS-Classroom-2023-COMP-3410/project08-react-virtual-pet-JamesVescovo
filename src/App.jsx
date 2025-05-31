@@ -10,9 +10,8 @@ function App() {
         petState,
         mood,
         achievements,
+        setAchievements,
         unlockedCount,
-        totalCount,
-        notification,
         feedPet,
         playWithPet,
         cleanPet,
@@ -38,9 +37,8 @@ function App() {
             petState={petState}
         />
         <div className="achievements-counter">
-            Achievements: {unlockedCount}/{totalCount}
+            Achievements: {unlockedCount}/7
         </div>
-        {notification && <Notification notification={notification} />}
         </div>
   );
 }
