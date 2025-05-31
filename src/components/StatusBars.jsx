@@ -22,8 +22,7 @@ export default function StatusBars({ stats }) {
                             className="status-bar" 
                             style={{
                                 width: `${item.value}%`, 
-                                backgroundColor: item.color,
-                                opacity: item.value > 30 ? 0.9 : 0.6
+                                backgroundColor: item.color
                             }}
                         />
                     </div>
