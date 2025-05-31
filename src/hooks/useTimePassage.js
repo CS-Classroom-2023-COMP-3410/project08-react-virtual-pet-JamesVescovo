@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 export function calculateAge(birthdate) {
     const now = Date.now();
     const elapsed = now - birthdate;
-    return Math.floor(elapsed / (1000 * 60)); 
+    return Math.floor(elapsed / (1000 * 60));
 }
 
 export const GROWTH_STAGES = {
@@ -14,82 +14,100 @@ export const GROWTH_STAGES = {
     adult: { min: 21, max: Infinity, emoji: '🐤' }
 };
 
-const STAT_DECAY_RATES = {
-    hunger: 30,      
-    energy: 40,    
-    happiness: 15,   
-    cleanliness: 20, 
-    health: 2      
-};
-
 function useTimePassage(petState, setPetState) {
+    // Calculate time elapsed since last visit
     useEffect(() => {
-        const minutesElapsed = (Date.now() - petState.lastVisited) / (1000 * 60);
-        
-        if (minutesElapsed > 0) {
-            applyTimePassageEffects(minutesElapsed);
+        const constant = 60;
+        const decay = {
+            hunger: 30 / constant,
+            energy: 40 / constant,
+            energy: 40 / constant,
+            happiness: 15 / constant,
+            cleanliness: 20 / constant,
+            health: 2 / constant
+        };
+
+        const second = 1000; 
+
+        if (petState.lastVisited) {
+            const minutesElapsed = (Date.now() - petState.lastVisited) / (1000 * 60);
+            if (minutesElapsed > 0) {
+                // Apply stat decay based on elapsed time
+                applyTimePassage(minutesElapsed, decay);
+            }
         }
 
-        const interval = setInterval(() => {
-            applyStatDecay(1/6); 
-        }, 10000); 
+        // Update last visited timestamp
 
         setPetState(prev => ({
             ...prev,
             lastVisited: Date.now()
         }));
 
+        // Set up interval for ongoing decay
+        const interval = setInterval(() => {
+            applyStatDecay(decay);
+        }, second);
+
         return () => clearInterval(interval);
     }, []);
 
-    function applyStatDecay(minutesFraction = 1) {
+    function applyStatDecay(decayRates) {
         setPetState(prev => {
+            // Calculate new stats with decay
             const newStats = { ...prev.stats };
-            const isSleeping = prev.activity === 'sleeping';
+            newStats.hunger = Math.max(newStats.hunger - decayRates.hunger, 0);
+            newStats.energy = Math.max(newStats.energy - decayRates.energy, 0);
+            newStats.happiness = Math.max(newStats.happiness - decayRates.happiness, 0);
+            newStats.cleanliness = Math.max(newStats.cleanliness - decayRates.cleanliness, 0);
+            newStats.health = Math.max(newStats.health - decayRates.health, 0);
 
-            // Apply decay rates
-            for (const [stat, rate] of Object.entries(STAT_DECAY_RATES)) {
-                if (stat === 'energy' && isSleeping) {
-                    newStats.energy = Math.min(newStats.energy + (20 * minutesFraction), 100);
-                } else {
-                    newStats[stat] = Math.max(newStats[stat] - (rate * minutesFraction), 0);
+            const ageMinutes = calculateAge(prev.birthdate);
+            let currentStage = prev.stage;
+            for (const [stage, range] of Object.entries(GROWTH_STAGES)) {
+                if (ageMinutes >= range.min && ageMinutes <= range.max) {
+                    currentStage = stage;
+                    break;
                 }
-            }
-
-            const isUnhealthy = Object.entries(newStats).some(
-                ([stat, value]) => stat !== 'health' && value < 30
-            );
-            
-            if (isUnhealthy) {
-                newStats.health = Math.max(newStats.health - (1 * minutesFraction), 0);
-            } else if (newStats.health < 100) {
-                newStats.health = Math.min(newStats.health + (0.5 * minutesFraction), 100);
             }
 
             return {
                 ...prev,
-                stats: newStats
+                stats: newStats,
+                stage: currentStage,
+                age: ageMinutes
             };
         });
     }
 
-    
+    function applyTimePassage(minutes, decayRates) {
+        // Similar to applyStatDecay but for longer time periods
+        setPetState(prev => {
+            const newStats = { ...prev.stats };
+            const decayMinutes = Math.min(minutes, 1440);
+            
+            newStats.hunger = Math.max(newStats.hunger - (decayRates.hunger * decayMinutes), 0);
+            newStats.energy = Math.max(newStats.energy - (decayRates.energy * decayMinutes), 0);
+            newStats.happiness = Math.max(newStats.happiness - (decayRates.happiness * decayMinutes), 0);
+            newStats.cleanliness = Math.max(newStats.cleanliness - (decayRates.cleanliness * decayMinutes), 0);
+            newStats.health = Math.max(newStats.health - (decayRates.health * decayMinutes), 0);
 
-    function applyTimePassageEffects(minutes) {
-        const fullMinutes = Math.floor(minutes);
-        const remainingSeconds = (minutes - fullMinutes) * 60;
+            const ageMinutes = calculateAge(prev.birthdate);
+            let currentStage = prev.stage;
+            for (const [stage, range] of Object.entries(GROWTH_STAGES)) {
+                if (ageMinutes >= range.min && ageMinutes <= range.max) {
+                    currentStage = stage;
+                    break;
+                }
+            }
 
-        // Apply full minutes of decay
-        if (fullMinutes > 0) {
-            applyStatDecay(fullMinutes);
-        }
-
-        // Apply remaining seconds
-        if (remainingSeconds > 0) {
-            setTimeout(() => {
-                applyStatDecay(remainingSeconds / 60);
-            }, 100);
-        }
+            return {
+                ...prev,
+                stats: newStats,
+                stage: currentStage,
+                age: ageMinutes
+            };
+        });
     }
 }
 
