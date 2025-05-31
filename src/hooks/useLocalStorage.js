@@ -1,50 +1,37 @@
 // src/hooks/useLocalStorage.js
 import { useEffect } from 'react';
 
-const STORAGE_KEY = 'virtualPetData';
-
-function useLocalStorage(petState, setPetState) {
+function useLocalStorage(petState, setPetState, achievements, setAchievements) {
     // Load saved state on initial mount
     useEffect(() => {
-        const loadPetData = () => {
+        const savedPet = localStorage.getItem('petData');
+        if (savedPet) {
             try {
-                const savedData = localStorage.getItem(STORAGE_KEY);
-                if (savedData) {
-                    const parsedData = JSON.parse(savedData);
-                    
-         
-                    const now = Date.now();
-                    const minutesPassed = (now - parsedData.lastVisited) / (1000 * 60);
-                    
-              
-                    parsedData.lastVisited = now;
-                    
-                    setPetState(parsedData);
-                    
-                    return minutesPassed;
-                }
+                setPetState(JSON.parse(savedPet));
             } catch (error) {
-                console.error("Failed to load pet data:", error);
-                localStorage.removeItem(STORAGE_KEY);
+                console.error('Error loading pet data:', error);
             }
-            return 0;
-        };
+        }
 
-        loadPetData();
-    }, []);
+        const savedAchievements = localStorage.getItem('petAchievements');
+        if (savedAchievements) {
+            try {
+                setAchievements(JSON.parse(savedAchievements));
+            } catch (error) {
+                console.error('Error loading achievements:', error);
+            }
+        }
+    }, [setPetState, setAchievements]);
 
     // Save state whenever it changes
     useEffect(() => {
-        const savePetData = () => {
-            try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(petState));
-            } catch (error) {
-                console.error("Failed to save pet data:", error);
-            }
-        };
-
-        savePetData();
+        localStorage.setItem('petData', JSON.stringify(petState));
     }, [petState]);
+
+    
+    useEffect(() => {
+        localStorage.setItem('petAchievements', JSON.stringify(achievements));
+    }, [achievements]);
 }
 
 export default useLocalStorage;
