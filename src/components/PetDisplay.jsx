@@ -1,35 +1,44 @@
 // src/components/PetDisplay.jsx
 export default function PetDisplay({ mood, growthStage, birthDate }) {
-  const GROWTH_EMOJIS = {
+  const GROWTH_STAGES = {
     baby: '🥚',
     child: '🐣',
     teen: '🐥',
     adult: '🐤'
   };
 
-  const MOOD_EMOJIS = {
+  const Mood = {
     happy: '😊',
     sad: '😢',
     sick: '🤒',
-    neutral: '😐',
+    bored: '😐',
     sleeping: '😴'
   };
 
-  // Calculate age in days (1 minute = 1 day)
-  const ageInDays = Math.floor((Date.now() - birthDate) / (1000 * 60));
+  
+  let Mstatus;
+  if (mood === 'sleeping') {
+    Mstatus = 'Sleeping';
+  } else {
+    Mstatus = 'Mood: ' + mood;
+  }
 
+  function calculateAge(birthdate) {
+    const now = Date.now();
+    const elapsed = now - birthdate;
+    return Math.floor(elapsed / (1000 * 60)); // 1 minute = 1 day
+  }
+  let Astatus = 'Age: ' + calculateAge(birthDate) + ' days';
   return (
-    <div className="pet-display">
-      <div className="pet-emoji">
-        <span>{GROWTH_EMOJIS[growthStage]}</span>
-        <span>{MOOD_EMOJIS[mood]}</span>
-      </div>
+    <>
+    
       <div className="pet-status">
-        {mood === 'sleeping' ? 'Sleeping' : `Mood: ${mood}`}
+        {Mstatus}
       </div>
       <div className="pet-age">
-        Age: {ageInDays} day{ageInDays !== 1 ? 's' : ''}
+        {Astatus}
       </div>
-    </div>
+    </>
   );
+
 }
