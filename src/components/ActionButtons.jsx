@@ -6,54 +6,47 @@ export default function ActionButtons({
     toggleSleep,
     petState 
 }) {
-    const isSleeping = petState.activity === 'sleeping';
-    const isBusy = petState.activity && !isSleeping;
-    const lowEnergy = petState.stats.energy < 10;
+    const sleeping = petState?.activity === 'sleeping';
+    const lowEnergy = petState?.stats?.energy < 10;
 
     const actions = [
         {
             name: 'Feed',
-            emoji: '🍕',
+            emoji: '🍔',
             action: feedPet,
-            disabled: isBusy || isSleeping,
-            tooltip: isSleeping ? "Can't feed while sleeping" : "Feed your pet"
+            disabled: sleeping,
         },
         {
             name: 'Play',
-            emoji: '⚽',
+            emoji: '🎮',
             action: playWithPet,
-            disabled: isBusy || isSleeping || lowEnergy,
-            tooltip: lowEnergy ? "Not enough energy" : "Play with your pet"
+            disabled: sleeping || lowEnergy,
         },
         {
             name: 'Clean',
             emoji: '🧼',
             action: cleanPet,
-            disabled: isBusy || isSleeping,
-            tooltip: isSleeping ? "Can't clean while sleeping" : "Clean your pet"
+            disabled: sleeping,
         },
         {
-            name: isSleeping ? 'Wake' : 'Sleep',
-            emoji: isSleeping ? '☀️' : '🌙',
-            action: toggleSleep,
-            disabled: isBusy,
-            tooltip: isSleeping ? "Wake up your pet" : "Put your pet to sleep"
+            name: sleeping ? 'Wake' : 'Sleep',
+            emoji: sleeping ? '☀️' : '🌙',
+            action: toggleSleep,  // Fixed: Changed from sleeping to toggleSleep
+            disabled: false
         }
     ];
 
     return (
         <div className="action-buttons">
-            {actions.map((action) => (
+            {actions.map(({name, emoji, action, disabled}) => (
                 <button
-                    key={action.name}
-                    onClick={action.action}
-                    disabled={action.disabled}
-                    className={`action-button ${action.disabled ? 'disabled' : ''}`}
-                    aria-label={action.tooltip}
-                    title={action.tooltip}
+                    key={name}
+                    onClick={disabled ? undefined : action}  // Fixed onClick conditional
+                    disabled={disabled}
+                    className={`action-button ${disabled ? 'disabled' : ''}`}
                 >
-                    <span className="action-emoji">{action.emoji}</span>
-                    <span className="action-name">{action.name}</span>
+                    <span className="action-emoji">{emoji}</span>
+                    <span className="action-name">{name}</span>
                 </button>
             ))}
         </div>
