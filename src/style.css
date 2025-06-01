@@ -1,0 +1,164 @@
+/* src/style.css */
+:root {
+    --primary: #3a86ff;
+    --secondary: #8338ec;
+    --background: #f8f9fa;
+    --text: #212529;
+    --border: #dee2e6;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--background);
+    color: var(--text);
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.app {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+h1 {
+    text-align: center;
+    color: var(--secondary);
+    margin-bottom: 10px;
+}
+
+.pet-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 20px;
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.pet-emoji {
+    font-size: 5rem;
+    transition: transform 0.3s ease;
+}
+
+@keyframes bounce {
+    from { transform: translateY(0); }
+    to { transform: translateY(-15px); }
+}
+
+.pet-status {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: var(--secondary);
+}
+
+
+.status-bars {
+    transition: width 0.5s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background-color: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.status-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.status-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.status-bar-container {
+    height: 10px;
+    background-color: #e9ecef;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.status-bar {
+    height: 100%;
+    border-radius: 5px;
+    transition: width 0.5s ease;
+}
+
+.action-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.action-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    background-color: var(--primary);
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.action-button:hover:not(.disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.action-button:active:not(.disabled) {
+    transform: translateY(0);
+}
+
+.action-button.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: #adb5bd;
+}
+
+.action-emoji {
+    font-size: 1.5rem;
+}
+
+.action-name {
+    font-size: 0.9rem;
+}
+
+@media (max-width: 480px) {
+    .action-buttons {
+        grid-template-columns: 1fr;
+    }
+    
+    .pet-emoji {
+        font-size: 4rem;
+    }
+}
+.pet-emoji {
+    font-size: 3rem;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.pet-status {
+    font-size: 1.2rem;
+    margin-top: 10px;
+    color: #555;
+}
+
