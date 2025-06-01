@@ -11,7 +11,7 @@ export default function PetDisplay({ mood, growthStage, birthDate }) {
     happy: '😊',
     sad: '😢',
     sick: '🤒',
-    bored: '😐',
+    neutral: '😐',
     sleeping: '😴'
   };
 
@@ -30,15 +30,20 @@ export default function PetDisplay({ mood, growthStage, birthDate }) {
   }
   let Astatus = 'Age: ' + calculateAge(birthDate) + ' days';
   return (
-    <>
-    
+   
+    <div className="pet-display">
+      <div className="pet-emoji">
+        <span>{GROWTH_STAGES[growthStage]}</span>
+        <span>{Mood[mood]}</span>
+      </div>
+
       <div className="pet-status">
         {Mstatus}
       </div>
       <div className="pet-age">
         {Astatus}
       </div>
-    </>
+    </div>
   );
 
 }
