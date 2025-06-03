@@ -17,13 +17,13 @@ export const GROWTH_STAGES = {
 function useTimePassage(petState, setPetState) {
     // Calculate time elapsed since last visit
     useEffect(() => {
-       // percent of status decayed per second
+        // percent of status decayed per second
         const decay = {
-            hunger: 3,
-            energy: 4,
-            happiness: 1.5,
-            cleanliness: 2,
-            health: 0.5
+            hunger: 1.5,
+            energy: 2,
+            happiness: 0.5,
+            cleanliness: 0.8,
+            health: 0.1
         };
 
 
@@ -43,9 +43,6 @@ function useTimePassage(petState, setPetState) {
             applyStatDecay(decay);
         }, 3000);
 
-        return () => {
-            clearInterval(interval);
-        }; 
     }, []);
 
     function applyStatDecay(decay) {
@@ -53,14 +50,19 @@ function useTimePassage(petState, setPetState) {
             // Calculate new stats with decay
             const newStats = { ...prev.stats };
             newStats.hunger = Math.max(newStats.hunger - decay.hunger, 0);
-            newStats.energy = Math.max(newStats.energy - decay.energy, 0);
+            if (prev.sleeping) {
+                newStats.energy = Math.min(newStats.energy + (decay.energy * 2), 100);
+            }
+            else {
+                newStats.energy = Math.max(newStats.energy - decay.energy, 0);
+            }
             newStats.happiness = Math.max(newStats.happiness - decay.happiness, 0);
             newStats.cleanliness = Math.max(newStats.cleanliness - decay.cleanliness, 0);
             newStats.health = Math.max(newStats.health - decay.health, 0);
 
             const ageMinutes = calculateAge(prev.birthdate);
             let currentStage = prev.stage;
-            
+
             for (const [stage, range] of Object.entries(GROWTH_STAGES)) {
                 if (ageMinutes >= range.min && ageMinutes <= range.max) {
                     currentStage = stage;
@@ -76,24 +78,29 @@ function useTimePassage(petState, setPetState) {
         });
     }
 
-    function applyTimePassage(minutes, decayRates) {
+    function applyTimePassage(minutes, decay) {
         // Similar to applyStatDecay but for longer time periods
         setPetState(prev => {
             const newStats = { ...prev.stats };
-            
-            newStats.hunger = Math.max(newStats.hunger - (decayRates.hunger*minutes),0);
-            newStats.energy = Math.max(newStats.energy -(decayRates.energy*minutes),0);
-            newStats.happiness = Math.max(newStats.happiness - (decayRates.happiness * minutes), 0);
-            newStats.cleanliness = Math.max(newStats.cleanliness -(decayRates.cleanliness * minutes),0);
-            newStats.health = Math.max(newStats.health - (decayRates.health * minutes), 0);
+
+            newStats.hunger = Math.max(newStats.hunger - (decay.hunger * minutes), 0);
+            if (prev.sleeping) {
+                newStats.energy = Math.min(newStats.energy + (decay.energy * 2 * minutes), 100);
+            }
+            else {
+                newStats.energy = Math.max(newStats.energy - decay.energy * minutes, 0);
+            }
+            newStats.happiness = Math.max(newStats.happiness - (decay.happiness * minutes), 0);
+            newStats.cleanliness = Math.max(newStats.cleanliness - (decay.cleanliness * minutes), 0);
+            newStats.health = Math.max(newStats.health - (decay.health * minutes), 0);
 
             const ageMinutes = calculateAge(prev.birthdate);
             let currentStage = prev.stage;
             for (const [stage, range] of Object.entries(GROWTH_STAGES)) {
-                if (ageMinutes>= range.min && ageMinutes <= range.max) {
+                if (ageMinutes >= range.min && ageMinutes <= range.max) {
                     currentStage = stage;
                 }
-        }
+            }
 
             return {
                 ...prev,
